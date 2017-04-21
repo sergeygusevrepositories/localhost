@@ -1,0 +1,33 @@
+<?php
+
+$server = 'http://phpxmlrpc.sourceforge.net/server.php';
+
+$request = xmlrpc_encode_request('examples.getStateName', [41]);
+
+echo '================= REQUEST ===================<br />';
+echo $request . '<br />';
+
+$context = stream_context_create(['http:' => [
+    'method' => 'POST',
+    'header' => 'Content-Type: text/xml',
+    'content' => $request
+]]);
+
+$content = file_get_contents($server, false, $context);
+
+echo '================= RESPONSE ==================<br />';
+echo $content . '<br />';
+
+echo '================== DATA =================<br />';
+
+$response = xmlrpc_decode($content);
+if(is_array($response) && xmprpc_is_fault($response))
+{
+    echo 'Error' . $response['faulCode'] . ':' . $response['faultString'];
+}
+else
+{
+    print_r($response);
+}
+
+?>
